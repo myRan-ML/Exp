@@ -6,3 +6,43 @@ body {
   @apply bg-gray-100 text-gray-800;
 }
 
+/* 全局图片样式 */
+img {
+  @apply rounded-lg object-cover;
+}
+
+/* 统一调整搜索框样式 */
+input[type="text"] {
+  @apply w-full p-2 border rounded-lg mb-4 border-gray-300 focus:border-blue-500 focus:outline-none;
+}
+
+/* 菜品列表容器样式 */
+.dish-card {
+  @apply bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition-all;
+}
+
+/* 优化菜品卡片 Hover 效果 */
+.dish-card:hover {
+  @apply shadow-xl;
+}
+
+/* 菜品图片容器 */
+.dish-img {
+  @apply w-full h-40 mb-4;
+}
+
+/* 增加小的动画效果 */
+button {
+  @apply transition-all duration-300 ease-in-out;
+}
+
+button:hover {
+  @apply bg-blue-600;
+}
+
+/* 在不同设备上优化布局 */
+@media (max-width: 640px) {
+  .dish-card {
+    @apply p-3;
+  }
+}

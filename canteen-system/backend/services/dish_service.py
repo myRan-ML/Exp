@@ -1,5 +1,4 @@
 from db_manager import DBManager
-from tabulate import tabulate
 from flask import Blueprint, request, jsonify
 
 class DishService:
@@ -7,8 +6,8 @@ class DishService:
         self.db = db
 
     def add_dish(self, dish):
-        sql = "INSERT INTO dish (DNO, DNAME, DPRICE) VALUES (%s, %s, %s)"
-        self.db.execute(sql, (dish["DNO"], dish["DNAME"], dish["DPRICE"]))
+        sql = "INSERT INTO dish (DNO, DNAME, DPRICE, DIMAGE, STOCK) VALUES (%s, %s, %s, %s, %s)"
+        self.db.execute(sql, (dish["DNO"], dish["DNAME"], dish["DPRICE"], dish["DIMAGE"], dish["STOCK"]))
         print("菜品添加成功!")
 
     def delete_dish(self, dno):
@@ -22,9 +21,22 @@ class DishService:
         print("菜品价格更新成功!")
 
     def query_all(self):
-        sql = "SELECT * FROM dish"
+        # 查询时包含库存字段
+        sql = "SELECT DNO, DNAME, DPRICE, DIMAGE, STOCK FROM dish"
         cursor = self.db.execute(sql)
-        return cursor.fetchall() if cursor else []
+        # 将查询结果转换为字典格式
+        result = cursor.fetchall() if cursor else []
+        # 确保返回的结果是字典格式
+        return [
+            {
+                "DNO": row["DNO"],
+                "DNAME": row["DNAME"],
+                "DPRICE": row["DPRICE"],
+                "DIMAGE": row["DIMAGE"],
+                "STOCK": row["STOCK"]
+            }
+            for row in result
+        ]
 
 # =========== Flask 蓝图 ===========
 dish_bp = Blueprint("dish", __name__)
@@ -33,10 +45,11 @@ dish_service = DishService(DBManager())
 @dish_bp.route("/add", methods=["POST"])
 def add_dish():
     dish = request.get_json()
-    if not all(k in dish for k in ["DNO", "DNAME", "DPRICE"]):
+    if not all(k in dish for k in ["DNO", "DNAME", "DPRICE", "DIMAGE", "STOCK"]):
         return jsonify({"error": "参数不完整"}), 400
     dish_service.add_dish(dish)
     return jsonify({"message": "菜品添加成功"}), 200
+
 
 @dish_bp.route("/delete/<int:dno>", methods=["DELETE"])
 def delete_dish(dno):

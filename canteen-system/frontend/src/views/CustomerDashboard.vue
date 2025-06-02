@@ -1,7 +1,7 @@
 <template>
-  <div class="min-h-screen bg-gray-100">
+  <div class="min-h-screen bg-cover bg-center bg-gray-100" style="background-image: url('/images/cafeteria.jpg');">
     <!-- 顶部导航 -->
-    <header class="bg-white shadow p-4 flex justify-between items-center">
+    <header class="bg-white bg-opacity-70 shadow p-4 flex justify-between items-center">
       <h1 class="text-2xl font-bold">南航食堂系统</h1>
       <div class="flex items-center gap-4">
         <button
@@ -28,10 +28,19 @@
 
     <!-- 主体 -->
     <div class="max-w-7xl mx-auto mt-6 grid grid-cols-3 gap-6">
-      <div class="col-span-2">
-        <DishList @add-to-cart="addToCart" />
+      <div class="col-span-2 bg-white bg-opacity-70 p-4 rounded-lg shadow-lg">
+        <input
+          v-model="searchQuery"
+          type="text"
+          placeholder="搜索菜品..."
+          class="w-full p-2 border rounded-lg mb-4"
+        />
+        <DishList 
+          @add-to-cart="addToCart" 
+          :search-query="searchQuery"
+        />
       </div>
-      <div>
+      <div class="bg-white bg-opacity-70 p-4 rounded-lg shadow-lg">
         <OrderForm
           :cart-items="cartItems"
           :remove-from-cart="removeFromCart"
@@ -60,7 +69,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue'
+import { defineComponent, ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import DishList from '../components/DishList.vue'
 import OrderForm from '../components/OrderForm.vue'
@@ -77,6 +86,7 @@ export default defineComponent({
     const errorMessage = ref('')
     const router = useRouter()
     const role = localStorage.getItem('role') || ''
+    const searchQuery = ref('')
 
     const addToCart = ({ dish, quantity }: { dish: any; quantity: number }) => {
       const existing = cartItems.value.find((item) => item.DNO === dish.DNO)
@@ -136,8 +146,51 @@ export default defineComponent({
       handleOrderFailed,
       message,
       errorMessage,
-      role
+      role,
+      searchQuery
     }
   }
 })
 </script>
+
+<style scoped>
+.min-h-screen {
+  background-image: url('/images/cafeteria.jpg');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed; /* 改进背景图的效果 */
+}
+
+header {
+  background-color: rgba(255, 255, 255, 0.7); /* 设置背景透明度 */
+}
+
+button {
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.bg-opacity-70 {
+  background-color: rgba(255, 255, 255, 0.7); /* 菜单列表和购物车的透明度 */
+}
+
+input[type="text"] {
+  font-size: 1rem;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 0.375rem;
+  transition: all 0.3s ease;
+}
+
+input[type="text"]:focus {
+  border-color: #1d4ed8;
+  outline: none;
+}
+
+input[type="text"]::placeholder {
+  color: #6b7280;
+}
+</style>

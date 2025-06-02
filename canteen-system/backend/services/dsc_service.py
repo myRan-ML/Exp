@@ -1,5 +1,4 @@
 from db_manager import DBManager
-from tabulate import tabulate
 from flask import Blueprint, request, jsonify
 
 class DscService:
@@ -18,9 +17,10 @@ class DscService:
 
     def query_by_win(self, win):
         sql = """
-            SELECT d.DNO, DNAME, DPRICE, DWIN, DTIME 
-            FROM dish d JOIN dsc s ON d.DNO = s.DNO 
-            WHERE DWIN = %s
+            SELECT d.DNO, d.DNAME, d.DPRICE, s.DWIN, s.DTIME 
+            FROM dish d 
+            JOIN dsc s ON d.DNO = s.DNO 
+            WHERE s.DWIN = %s
         """
         cursor = self.db.execute(sql, (win,))
         return cursor.fetchall() if cursor else []
@@ -54,3 +54,18 @@ def query_by_window():
         return jsonify({"error": "缺少窗口号"}), 400
     data = dsc_service.query_by_win(win)
     return jsonify(data), 200
+
+@dsc_bp.route('/api/window/all', methods=['GET'])
+def get_all_windows():
+    try:
+        # 假设数据库中窗口号存储在 `window` 表中的 `DWIN` 列
+        query = "SELECT DWIN FROM window"
+        db = DBManager()
+        cursor = db.execute(query)
+        windows = cursor.fetchall() if cursor else []
+        return jsonify(windows), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+
